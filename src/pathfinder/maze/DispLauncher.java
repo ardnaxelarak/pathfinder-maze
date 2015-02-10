@@ -15,7 +15,7 @@ public class DispLauncher extends Frame
 {
     private Display disp;
 
-    public DispLauncher(String title, int width, int height, int screen, boolean fullScreen)
+    public DispLauncher(String title, int width, int height, int screen, boolean fullScreen, String filename)
     {
         super(title);
 
@@ -23,7 +23,7 @@ public class DispLauncher extends Frame
         GraphicsDevice[] gs = ge.getScreenDevices();
 
         setLayout(new BorderLayout());
-        disp = new Display(width, height);
+        disp = new Display(width, height, filename);
         disp.setSize(new Dimension(width, height));
         add(disp, BorderLayout.CENTER);
         disp.init();
@@ -54,5 +54,10 @@ public class DispLauncher extends Frame
                 disp.exit();
             }
         });
+    }
+
+    public void setMiniMap(int mode, int size)
+    {
+        disp.setMiniMap(mode, size);
     }
 }
