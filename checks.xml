@@ -39,7 +39,7 @@
 			<property name="allowNoEmptyLineBetweenFields" value="true"/>
 		</module>
 		<module name="ImportOrder">
-			<property name="groups" value="pathfinder,com.google,java"/>
+			<property name="groups" value="pathfinder,processing,joptsimple,com.google,java"/>
 			<property name="separated" value="true"/>
 		</module>
 		<module name="LeftCurly">
