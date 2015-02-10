@@ -1,0 +1,96 @@
+<project name="pathfinder-maze" default="jar" basedir=".">
+	<property name="src.path" value="src"/>
+	<property name="build.path" value="build"/>
+	<property name="build.classes.path" value="${build.path}/classes"/>
+	<property name="build.src.path" value="${build.path}/src"/>
+	<property name="lib.path" value="lib"/>
+	<property name="img.path" value="images"/>
+
+    <property name="main-class" value="pathfinder.maze.Main"/>
+
+	<property name="antlr.jar" value="${lib.path}/antlr-4.4-complete.jar"/>
+	<property name="version" value="0.0.0"/>
+    <property name="jarname" value="${ant.project.name}-${version}.jar"/>
+
+	<property name="one-jar.dist.dir" value="/usr/local/lib/one-jar-ant"/>
+	<import file="${one-jar.dist.dir}/one-jar-ant-task.xml" optional="true"/>
+
+	<taskdef resource="checkstyletask.properties" classpath="${lib.path}/checkstyle-6.2-all.jar"/>
+
+	<path id="project.classpath">
+		<pathelement location="${src.path}"/>
+		<fileset dir="${lib.path}" includes="*.jar"/>
+	</path>
+
+	<pathconvert property="manifest.classpath" pathsep=" ">
+		<path refid="project.classpath"/>
+		<mapper>
+			<chainedmapper>
+				<flattenmapper/>
+				<globmapper from="*.jar" to="${lib.path}/*.jar"/>
+			</chainedmapper>
+		</mapper>
+	</pathconvert>
+
+	<target name="init">
+		<tstamp/>
+		<mkdir dir="${build.path}"/>
+		<mkdir dir="${build.classes.path}"/>
+	</target>
+
+	<target name="check">
+		<checkstyle config="checks.xml">
+			<fileset dir="${src.path}" includes="**/*.java"/>
+		</checkstyle>
+	</target>
+
+	<target name="compile" depends="init">
+		<javac includeantruntime="false" debug="true" destdir="${build.classes.path}">
+			<compilerarg value="-Xlint:unchecked"/>
+			<src path="${src.path}"/>
+			<classpath refid="project.classpath"/>
+		</javac>
+	</target>
+
+    <target name="run" depends="compile">
+        <java classname="${main-class}" fork="true" spawn="true">
+            <classpath refid="project.classpath"/>
+            <classpath path="${build.classes.path}"/>
+        </java>
+    </target>
+
+	<target name="jar" depends="compile, check">
+		<jar basedir="${build.classes.path}" destfile="${jarname}">
+			<manifest>
+				<attribute name="Built-By" value="${builder}" />
+				<attribute name="Built-On" value="${build-info.current-date}" />
+				<attribute name="Built-At" value="${build-info.current-time}" />
+                <attribute name="Main-Class" value="${main-class}"/>
+				<attribute name="Class-Path" value="${manifest.classpath}"/>
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="clean">
+		<delete dir="${build.path}"/>
+	</target>
+
+	<target name="one-jar" depends="jar">
+		<one-jar destfile="${build.path}/artnav-onejar.jar">
+			<manifest>
+				<attribute name="Built-By" value="${builder}" />
+				<attribute name="Built-On" value="${build-info.current-date}" />
+				<attribute name="Built-At" value="${build-info.current-time}" />
+                <attribute name="Main-Class" value="${main-class}"/>
+			</manifest>
+			<main jar="${jarname}"/>
+			<lib>
+				<fileset dir="${lib.path}" includes="*.jar"/>
+			</lib>
+			<binlib>
+				<fileset dir="${lib.path}" includes="*.so"/>
+			</binlib>
+			<fileset dir="${img.path}" includes="*.png"/>
+		</one-jar>
+	</target>
+</project>
